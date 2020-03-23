@@ -11,7 +11,7 @@ import AVFoundation
 
 /**
  Possible BoumBoum Errors.
-
+ 
  - AlreadyRunning:                  Means you asked to start monitoring while it already is.
  - AlreadyStopped:                  Means you asked to stop monitoring while it's not.
  - CameraUnavailable:               Means the camera isn't available.
@@ -19,13 +19,13 @@ import AVFoundation
  - CameraLockFailed:                Means the camera lock failed to update the configuration.
  - CameraDeviceInputCreationFailed: Means the camera device input creation failed.
  */
-public enum BoumBoumError: ErrorType {
-    case AlreadyRunning
-    case AlreadyStopped
-    case CameraUnavailable
-    case TorchModeUnsupported
-    case CameraLockFailed(NSError)
-    case CameraDeviceInputCreationFailed(NSError)
+public enum BoumBoumError: Error {
+    case alreadyRunning
+    case alreadyStopped
+    case cameraUnavailable
+    case torchModeUnsupported
+    case cameraLockFailed(NSError)
+    case cameraDeviceInputCreationFailed(NSError)
 }
 
 /// The delegate protocol.
@@ -33,7 +33,7 @@ public protocol BoumBoumDelegate: class {
     /**
      Called when the averate heart rate is updated. At start, it may take a while
      but after the first average has been computed, it will be called regularly.
-
+     
      - parameter boumBoum: BoumBoum instance.
      - parameter rate:     The heart rate.
      */
@@ -46,57 +46,57 @@ public protocol BoumBoumDelegate: class {
 public class BoumBoum: NSObject {
     /**
      Possible BoumBoum states.
-
+     
      - Running: BoumBoum is monitoring.
      - Stopped: BoumBoum isn't monitoring.
      */
     public enum State {
-        case Running
-        case Stopped
+        case running
+        case stopped
     }
-
+    
     /// The capture session.
     public let session: AVCaptureSession
-
+    
     /// The camera.
     public let camera: AVCaptureDevice?
-
+    
     /// The delegate.
     public weak var delegate: BoumBoumDelegate?
-
-
+    
+    
     /// The state.
-    public private(set) var state = State.Stopped
-
-
+    public private(set) var state = State.stopped
+    
+    
     /// The rate analyzer.
     private let analyzer = BoumBoumAnalyzer()
-
+    
     /// The camera input.
     private var cameraInput: AVCaptureDeviceInput?
-
+    
     /// The video output.
     private var videoOutput: AVCaptureVideoDataOutput?
-
+    
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
-
+    
     /**
-    Initializes BoumBoum with a new `AVCaptureSession` and the default camera.
-
-    - returns: An initialized BoumBoum.
-    */
+     Initializes BoumBoum with a new `AVCaptureSession` and the default camera.
+     
+     - returns: An initialized BoumBoum.
+     */
     public convenience override init() {
         self.init(session: AVCaptureSession(),
-            camera: AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo))
+                  camera: AVCaptureDevice.default(for: .video))
     }
-
+    
     /**
      Initializes BoumBoum with a given `AVCaptureSession` and a given camera.
-
+     
      - parameter session: A capture session.
      - parameter camera:  A reference to the back camera.
-
+     
      - returns: An initialized BoumBoum.
      */
     public init(session: AVCaptureSession, camera: AVCaptureDevice) {
@@ -104,13 +104,13 @@ public class BoumBoum: NSObject {
         self.camera = camera
         super.init()
     }
-
+    
     /**
      Initializes BoumBoum with a given `AVCaptureSession` and a given camera.
-
+     
      - parameter session: A capture session.
      - parameter camera:  A reference to the back camera.
-
+     
      - returns: An initialized BoumBoum.
      */
     private init(session: AVCaptureSession, camera: AVCaptureDevice?) {
@@ -118,42 +118,29 @@ public class BoumBoum: NSObject {
         self.camera = camera
         super.init()
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////
-
-
+    
+    
     // MARK: Start / Stop
     ////////////////////////////////////////////////////////////////////////////
-
+    
     /**
-    Starts monitoring the heart rate.
-
-    - throws: A `BoumBoumError` if something fails.
-    */
+     Starts monitoring the heart rate.
+     
+     - throws: A `BoumBoumError` if something fails.
+     */
     public func startMonitoring() throws {
         //Ensuring we have a camera
         guard let camera = camera else {
-            throw BoumBoumError.CameraUnavailable
+            throw BoumBoumError.cameraUnavailable
         }
-
+        
         //Ensuring we're stopped
-        guard state == .Stopped else {
-            throw BoumBoumError.AlreadyRunning
+        guard state == .stopped else {
+            throw BoumBoumError.alreadyRunning
         }
-
-        //First, we turn on the torch
-        guard camera.isTorchModeSupported(.On) else {
-            throw BoumBoumError.TorchModeUnsupported
-        }
-
-        do {
-            try camera.lockForConfiguration()
-            camera.torchMode = .On
-            camera.unlockForConfiguration()
-        } catch let error {
-            throw BoumBoumError.CameraLockFailed(error as NSError)
-        }
-
+        
         //Then, we create an input
         let cameraInput: AVCaptureDeviceInput
         if let existingInput = self.cameraInput {
@@ -164,43 +151,57 @@ public class BoumBoum: NSObject {
                 cameraInput = try AVCaptureDeviceInput(device: camera)
                 self.cameraInput = cameraInput
             } catch let error {
-                throw BoumBoumError.CameraDeviceInputCreationFailed(error as NSError)
+                throw BoumBoumError.cameraDeviceInputCreationFailed(error as NSError)
             }
         }
-
+        
         //Let's create the output
-        let cameraOutput = videoOutput ?? configuredCameraOutput(self)
+        let cameraOutput = videoOutput ?? configuredCameraOutput(delegate: self)
         videoOutput = cameraOutput
-
+        
         //Configure session
-        session.sessionPreset = AVCaptureSessionPresetLow
+        session.sessionPreset = .low
         session.addInput(cameraInput)
         session.addOutput(cameraOutput)
-
+        
         //And we're good to go
         session.startRunning()
-        state = .Running
-    }
+        state = .running
 
+        //First, we turn on the torch
+        guard camera.isTorchModeSupported(.on) else {
+            throw BoumBoumError.torchModeUnsupported
+        }
+
+        do {
+            try camera.lockForConfiguration()
+            try camera.setTorchModeOn(level: 1.0)
+            camera.torchMode = .on
+            camera.unlockForConfiguration()
+        } catch let error {
+            throw BoumBoumError.cameraLockFailed(error as NSError)
+        }
+    }
+    
     /**
      Stops monitoring the heart rate.
-
+     
      - throws: A `BoumBoumError` if something fails.
      */
     public func stopMonitoring() throws {
         //Ensuring we have a camera
         guard let camera = camera else {
-            throw BoumBoumError.CameraUnavailable
+            throw BoumBoumError.cameraUnavailable
         }
-
+        
         //Ensuring we're running
-        guard state == .Running else {
-            throw BoumBoumError.AlreadyStopped
+        guard state == .running else {
+            throw BoumBoumError.alreadyStopped
         }
-
+        
         //First, we stop the session
         session.stopRunning()
-
+        
         //Then we remove input and output
         if let cameraInput = cameraInput {
             session.removeInput(cameraInput)
@@ -208,61 +209,62 @@ public class BoumBoum: NSObject {
         if let videoOutput = videoOutput {
             session.removeOutput(videoOutput)
         }
-
+        
         //And we turn off the torch
-        guard camera.isTorchModeSupported(.On) else {
-            throw BoumBoumError.TorchModeUnsupported
+        guard camera.isTorchModeSupported(.on) else {
+            throw BoumBoumError.torchModeUnsupported
         }
-
+        
         do {
             try camera.lockForConfiguration()
-            camera.torchMode = .Off
+            camera.torchMode = .off
             camera.unlockForConfiguration()
         } catch let error {
-            throw BoumBoumError.CameraLockFailed(error as NSError)
+            throw BoumBoumError.cameraLockFailed(error as NSError)
         }
-
+        
         //We're good to go
-        state = .Stopped
+        state = .stopped
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////
-
-
+    
+    
     // MARK: Output creation
     ////////////////////////////////////////////////////////////////////////////
-
+    
     /**
-    Configures an `AVCatpureVideoDataOutput`.
-
-    - parameter delegate: The delegate to set.
-
-    - returns: A configured `AVCatpureVideoDataOutput`.
-    */
+     Configures an `AVCatpureVideoDataOutput`.
+     
+     - parameter delegate: The delegate to set.
+     
+     - returns: A configured `AVCatpureVideoDataOutput`.
+     */
     private func configuredCameraOutput(delegate: AVCaptureVideoDataOutputSampleBufferDelegate) -> AVCaptureVideoDataOutput {
         let videoOutput = AVCaptureVideoDataOutput()
-        let queue = dispatch_queue_create("be.delannoyk.boumboum", nil)
+        let queue = DispatchQueue(label: "be.delannoyk.boumboum")
         videoOutput.setSampleBufferDelegate(delegate, queue: queue)
         videoOutput.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey: NSNumber(unsignedInt: kCVPixelFormatType_32BGRA)
+            kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32BGRA)
         ]
         return videoOutput
     }
-
+    
     ////////////////////////////////////////////////////////////////////////////
 }
 
 extension BoumBoum: AVCaptureVideoDataOutputSampleBufferDelegate {
-    public func captureOutput(captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
+    public func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let value = CMSampleBufferGetImageBuffer(sampleBuffer)?.averageRGBHSVValueFromImageBuffer() else {
             return
         }
-
-        analyzer.pushValues(value.hsv)
+        
+        analyzer.pushValues(hsv: value.hsv)
+        
         if let rate = analyzer.averageBoumBoum() {
-            dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 if let strongSelf = self {
-                    strongSelf.delegate?.boumBoum(strongSelf, didFindAverageRate: rate)
+                    strongSelf.delegate?.boumBoum(boumBoum: strongSelf, didFindAverageRate: rate)
                 }
             }
         }

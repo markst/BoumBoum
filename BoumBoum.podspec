@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
     :tag => s.version.to_s
   }
   s.source_files = 'sources/BoumBoum/**/*.swift'
+  s.swift_version = '5.0'
 
   s.ios.deployment_target = '8.0'
 

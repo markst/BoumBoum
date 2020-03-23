@@ -14,19 +14,20 @@ typealias HSV = (h: CGFloat, s: CGFloat, v: CGFloat)
 
 extension CVImageBuffer {
     func averageRGBHSVValueFromImageBuffer() -> (rgb: RGB, hsv: HSV) {
-        CVPixelBufferLockBaseAddress(self, 0)
-
+        CVPixelBufferLockBaseAddress(self, CVPixelBufferLockFlags(rawValue: 0))
+        
         let width = CVPixelBufferGetWidth(self)
         let height = CVPixelBufferGetHeight(self)
-
-        var buffer = UnsafeMutablePointer<UInt8>(CVPixelBufferGetBaseAddress(self))
+        
+        let baseAddress = CVPixelBufferGetBaseAddress(self)
+        var buffer = baseAddress!.assumingMemoryBound(to: UInt8.self)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(self)
-
+        
         //Let's compute average RGB value of the frame
         var r = CGFloat(0)
         var g = CGFloat(0)
         var b = CGFloat(0)
-
+        
         for _ in 0..<height {
             for x in 0..<width {
                 let rx = x * 4
@@ -36,29 +37,29 @@ extension CVImageBuffer {
             }
             buffer += bytesPerRow
         }
-
-        CVPixelBufferUnlockBaseAddress(self, 0)
-
+        
+        CVPixelBufferUnlockBaseAddress(self, CVPixelBufferLockFlags(rawValue: 0))
+        
         let bufferSize = width * height
         r = r / CGFloat(255 * bufferSize)
         g = g / CGFloat(255 * bufferSize)
         b = b / CGFloat(255 * bufferSize)
-
+        
         let rgb = (r, g, b)
-        let hsv = RGBToHSV(rgb)
+        let hsv = RGBToHSV(value: rgb)
         return (rgb, hsv)
     }
-
+    
     private func RGBToHSV(value: RGB) -> HSV {
         let minimum = min(value.r, min(value.g, value.b))
         let maximum = max(value.r, max(value.g, value.b))
         let delta = maximum - minimum
-
-        if maximum > CGFloat(FLT_EPSILON) {
+        
+        if maximum > CGFloat(Float.ulpOfOne) {
             let h: CGFloat
             let v = maximum
             let s = delta / maximum
-
+            
             if value.r == maximum {
                 h = (value.g - value.b) / delta
             }
@@ -68,7 +69,7 @@ extension CVImageBuffer {
             else {
                 h = 4 + (value.r - value.g) / delta
             }
-
+            
             if h < 0 {
                 return (h + 360, 0, 0)
             }

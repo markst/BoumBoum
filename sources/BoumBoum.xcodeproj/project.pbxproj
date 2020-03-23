@@ -13,15 +13,15 @@
 		4628F8BB1C5506B200B34429 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4628F8B91C5506B200B34429 /* Main.storyboard */; };
 		4628F8BD1C5506B200B34429 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4628F8BC1C5506B200B34429 /* Assets.xcassets */; };
 		4628F8C01C5506B200B34429 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4628F8BE1C5506B200B34429 /* LaunchScreen.storyboard */; };
-		4628F8C71C550BE000B34429 /* BoumBoum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B0A1211C4FFDDE0016C2AA /* BoumBoum.framework */; };
 		46B0A1251C4FFDDE0016C2AA /* BoumBoum.h in Headers */ = {isa = PBXBuildFile; fileRef = 46B0A1241C4FFDDE0016C2AA /* BoumBoum.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		46B0A12D1C4FFE220016C2AA /* BoumBoum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B0A12C1C4FFE220016C2AA /* BoumBoum.swift */; };
 		46B0A1311C5002370016C2AA /* CVImageBuffer+RGBHSVAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B0A1301C5002370016C2AA /* CVImageBuffer+RGBHSVAverage.swift */; };
-		46D9C7171C550F3200373BF7 /* BoumBoum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46B0A1211C4FFDDE0016C2AA /* BoumBoum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4D746E612429753300EBBA2A /* BoumBoum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46B0A1211C4FFDDE0016C2AA /* BoumBoum.framework */; };
+		4D746E622429753300EBBA2A /* BoumBoum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 46B0A1211C4FFDDE0016C2AA /* BoumBoum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		4628F8C51C550BDC00B34429 /* PBXContainerItemProxy */ = {
+		4D746E632429753300EBBA2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46B0A1181C4FFDDE0016C2AA /* Project object */;
 			proxyType = 1;
@@ -31,13 +31,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		46D9C7181C550F3200373BF7 /* Embed Frameworks */ = {
+		4D746E652429753400EBBA2A /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				46D9C7171C550F3200373BF7 /* BoumBoum.framework in Embed Frameworks */,
+				4D746E622429753300EBBA2A /* BoumBoum.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4628F8C71C550BE000B34429 /* BoumBoum.framework in Frameworks */,
+				4D746E612429753300EBBA2A /* BoumBoum.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,8 +98,11 @@
 				46B0A1231C4FFDDE0016C2AA /* BoumBoum */,
 				4628F8B41C5506B200B34429 /* BoumBoumExample */,
 				46B0A1221C4FFDDE0016C2AA /* Products */,
+				4D746E5B242974AC00EBBA2A /* Frameworks */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
 		};
 		46B0A1221C4FFDDE0016C2AA /* Products */ = {
 			isa = PBXGroup;
@@ -120,6 +123,13 @@
 				46B0A1261C4FFDDE0016C2AA /* Info.plist */,
 			);
 			path = BoumBoum;
+			sourceTree = "<group>";
+		};
+		4D746E5B242974AC00EBBA2A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,12 +153,12 @@
 				4628F8AF1C5506B200B34429 /* Sources */,
 				4628F8B01C5506B200B34429 /* Frameworks */,
 				4628F8B11C5506B200B34429 /* Resources */,
-				46D9C7181C550F3200373BF7 /* Embed Frameworks */,
+				4D746E652429753400EBBA2A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				4628F8C61C550BDC00B34429 /* PBXTargetDependency */,
+				4D746E642429753300EBBA2A /* PBXTargetDependency */,
 			);
 			name = BoumBoumExample;
 			productName = BoumBoumExample;
@@ -188,6 +198,7 @@
 					};
 					46B0A1201C4FFDDE0016C2AA = {
 						CreatedOnToolsVersion = 7.2;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -196,6 +207,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -253,10 +265,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		4628F8C61C550BDC00B34429 /* PBXTargetDependency */ = {
+		4D746E642429753300EBBA2A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 46B0A1201C4FFDDE0016C2AA /* BoumBoum */;
-			targetProxy = 4628F8C51C550BDC00B34429 /* PBXContainerItemProxy */;
+			targetProxy = 4D746E632429753300EBBA2A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -289,6 +301,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.BoumBoumExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -301,6 +314,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.BoumBoumExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -397,6 +411,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -407,7 +423,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.BoumBoum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -415,6 +434,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -425,6 +446,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = be.delannoyk.BoumBoum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
