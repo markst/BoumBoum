@@ -20,9 +20,9 @@ class ViewController: UIViewController, BoumBoumDelegate {
         animation.duration = 0.7
         animation.repeatCount = Float.infinity
         animation.autoreverses = true
-        animation.fromValue = NSNumber(float: 1)
-        animation.toValue = NSNumber(float: 0.7)
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        animation.fromValue = NSNumber(value: 1)
+        animation.toValue = NSNumber(value: 0.7)
+        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)
         return animation
     }()
 
@@ -33,19 +33,19 @@ class ViewController: UIViewController, BoumBoumDelegate {
     }
 
     @IBAction func buttonStartPressed(sender: UIButton) {
-        if boum.state == .Stopped {
+        if boum.state == .stopped {
             do {
                 try boum.startMonitoring()
-                sender.setTitle("Stop Monitoring", forState: .Normal)
-                imageViewHeart?.layer.addAnimation(animation, forKey: "heart")
+                sender.setTitle("Stop Monitoring", for: .normal)
+                imageViewHeart?.layer.add(animation, forKey: "heart")
             } catch {
             }
         }
         else {
             do {
                 try boum.stopMonitoring()
-                sender.setTitle("Start Monitoring", forState: .Normal)
-                imageViewHeart?.layer.removeAnimationForKey("heart")
+                sender.setTitle("Start Monitoring", for: .normal)
+                imageViewHeart?.layer.removeAnimation(forKey: "heart")
             } catch {
             }
         }
